@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -56,6 +57,31 @@ namespace URF.Core.Sample.NoSql.Api.Controllers
             return Ok(result);
         }
 
+        // PUT: api/Book/AddReviewer/5
+        [HttpPut("AddReviewer/{id}")]
+        public async Task<ActionResult<Book>> AddReviewer(string id, [FromBody] Reviewer value)
+        {
+            var update = Builders<Book>.Update.Push<Reviewer>(e => e.Reviewers, value);
+            var result = await UnitOfWork.BooksRepository.FindOneAndUpdateAsync(e => e.Id == id, update);
+            return Ok(result);
+        }
+
+        // PUT: api/Book/UpdateReviewer/5
+        [HttpPut("UpdateReviewer/{id}")]
+        public async Task<ActionResult<Book>> UpdateReviewer(string id, [FromBody] Reviewer value)
+        {
+            var filter = Builders<Book>.Filter;
+            var bookReviewerFilter = filter.And(
+              filter.Eq(x => x.Id, id),
+              filter.ElemMatch(x => x.Reviewers, c => c.Name == value.Name));
+
+            // update with positional operator
+            var update = Builders<Book>.Update;
+            var reviewerSetter = update.Set("Reviewers.$.Institute", value.Institute);
+            var result = await UnitOfWork.BooksRepository.FindOneAndUpdateAsync(bookReviewerFilter, reviewerSetter);
+            return Ok(result);
+        }
+
         // DELETE: api/Book/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
@@ -63,6 +89,16 @@ namespace URF.Core.Sample.NoSql.Api.Controllers
             var count = await UnitOfWork.BooksRepository.DeleteOneAsync(e => e.Id == id);
             if (count == 0) return NotFound();
             return NoContent();
+        }
+
+        // DELETE: api/Book/5/Reviewer/Jamse Wood
+        [HttpDelete("{id}/Reviewer/{name}")]
+        public async Task<IActionResult> DeleteReviewer(string id, string name)
+        {
+            var update = Builders<Book>.Update.PullFilter(p => p.Reviewers,
+                                                f => f.Name == name);
+            var result = await UnitOfWork.BooksRepository.FindOneAndUpdateAsync(p => p.Id == id, update);
+            return Ok(result);
         }
     }
 }

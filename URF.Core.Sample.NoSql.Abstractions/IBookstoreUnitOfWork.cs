@@ -5,8 +5,8 @@ namespace URF.Core.Sample.NoSql.Abstractions
 {
     public interface IBookstoreUnitOfWork
     {
-        public IDocumentRepository<Author> AuthorsRepository { get; }
+        public IDocumentRepositoryExtension<Author> AuthorsRepository { get; }
 
-        public IDocumentRepository<Book> BooksRepository { get; }
+        public IDocumentRepositoryExtension<Book> BooksRepository { get; }
     }
 }

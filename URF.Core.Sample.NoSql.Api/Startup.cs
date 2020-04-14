@@ -58,8 +58,8 @@ namespace URF.Core.Sample.NoSql.Api
             });
 
             // Register unit of work and repositories
-            services.AddSingleton<IDocumentRepository<Author>, DocumentRepository<Author>>();
-            services.AddSingleton<IDocumentRepository<Book>, DocumentRepository<Book>>();
+            services.AddSingleton<IDocumentRepositoryExtension<Author>, DocumentRepositoryExtension<Author>>();
+            services.AddSingleton<IDocumentRepositoryExtension<Book>, DocumentRepositoryExtension<Book>>();
             services.AddSingleton<IBookstoreUnitOfWork, BookstoreUnitOfWork>();
 
             // Register controllers

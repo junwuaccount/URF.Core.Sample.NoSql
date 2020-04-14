@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.Collections.Generic;
 
 namespace URF.Core.Sample.NoSql.Models
 {
@@ -17,6 +18,15 @@ namespace URF.Core.Sample.NoSql.Models
         public string Category { get; set; }
 
         public string Author { get; set; }
+
+        public List<Reviewer> Reviewers { get; set; }
+    }
+
+    public class Reviewer
+    {
+        public string Name { get; set; }
+
+        public string Institute { get; set; }
     }
 
 }

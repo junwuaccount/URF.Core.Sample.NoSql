@@ -6,15 +6,15 @@ namespace URF.Core.Sample.NoSql.Mongo
 {
     public class BookstoreUnitOfWork : IBookstoreUnitOfWork
     {
-        public BookstoreUnitOfWork(IDocumentRepository<Author> authorsRepository,
-            IDocumentRepository<Book>booksRepository)
+        public BookstoreUnitOfWork(IDocumentRepositoryExtension<Author> authorsRepository,
+            IDocumentRepositoryExtension<Book>booksRepository)
         {
             AuthorsRepository = authorsRepository;
             BooksRepository = booksRepository;
         }
 
-        public IDocumentRepository<Author> AuthorsRepository { get; }
+        public IDocumentRepositoryExtension<Author> AuthorsRepository { get; }
 
-        public IDocumentRepository<Book> BooksRepository { get; }
+        public IDocumentRepositoryExtension<Book> BooksRepository { get; }
     }
 }
