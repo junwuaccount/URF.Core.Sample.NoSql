@@ -26,6 +26,12 @@ namespace URF.Core.Sample.NoSql.Api
             return await FindOneAsync(filter, cancellationToken);
         }
 
+        public virtual async Task<TEntity> FindOneAndUpdateAsync(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> update, FindOneAndUpdateOptions<TEntity, TEntity> updateOptions, CancellationToken cancellationToken = default)
+        {
+            await Collection.FindOneAndUpdateAsync(filter, update, updateOptions, cancellationToken);
+            return await FindOneAsync(filter, cancellationToken);
+        }
+
         public virtual async Task<TEntity> FindOneAndUpdateAsync(FilterDefinition<TEntity> filter, UpdateDefinition<TEntity> update, CancellationToken cancellationToken = default)
         {
             await Collection.FindOneAndUpdateAsync(filter, update, null, cancellationToken);
@@ -36,6 +42,12 @@ namespace URF.Core.Sample.NoSql.Api
         {
             var result = await Collection.DeleteOneAsync(filter, cancellationToken);
             return (int)result.DeletedCount;
+        }
+
+        public virtual async Task<TEntity> UpdateOneAsync(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> update, UpdateOptions updateOptions, CancellationToken cancellationToken = default)
+        {
+            await Collection.UpdateOneAsync(filter, update, updateOptions, cancellationToken);
+            return await FindOneAsync(filter, cancellationToken);
         }
     }
 }

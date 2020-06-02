@@ -11,6 +11,7 @@ namespace URF.Core.Sample.NoSql.Abstractions
     {
         Task<TEntity> FindOneAsync(FilterDefinition<TEntity> filter, CancellationToken cancellationToken = default);
         Task<TEntity> FindOneAndUpdateAsync(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> update, CancellationToken cancellationToken = default);
+        Task<TEntity> UpdateOneAsync(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> update, UpdateOptions updateOptions, CancellationToken cancellationToken = default);
         Task<TEntity> FindOneAndUpdateAsync(FilterDefinition<TEntity> filter, UpdateDefinition<TEntity> update, CancellationToken cancellationToken = default);
         Task<int> DeleteOneAsync(FilterDefinition<TEntity> filter, CancellationToken cancellationToken = default);
 

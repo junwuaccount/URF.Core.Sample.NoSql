@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,16 +58,96 @@ namespace URF.Core.Sample.NoSql.Api.Controllers
             return Ok(result);
         }
 
-        // PUT: api/Book/AddReviewer/5
+        // PUT: api/Book/AddReviewer/5e94940cf9ccc34df04c9e74/
         [HttpPut("AddReviewer/{id}")]
-        public async Task<ActionResult<Book>> AddReviewer(string id, [FromBody] Reviewer value)
+        public async Task<ActionResult<Book>> AddReviewer(string id, string reviewerName, [FromBody] Reviewer value)
         {
             var update = Builders<Book>.Update.Push<Reviewer>(e => e.Reviewers, value);
             var result = await UnitOfWork.BooksRepository.FindOneAndUpdateAsync(e => e.Id == id, update);
             return Ok(result);
         }
 
-        // PUT: api/Book/UpdateReviewer/5
+        // PUT: api/Book/AddReviewerPublisher/5e94940cf9ccc34df04c9e74/Aho Ulm
+        [HttpPut("AddReviewerPublisher/{id}/{reviewerName}")]
+        public async Task<ActionResult<Book>> AddReviewerPublisher(string id, string reviewerName, [FromBody] Publisher value)
+        {
+            var filter = Builders<Book>.Filter;
+            var bookReviewerFilter = filter.And(
+              filter.Eq(x => x.Id, id),
+              filter.ElemMatch(x => x.Reviewers, c => c.Name == reviewerName));
+
+            // update with positional operator
+            var update = Builders<Book>.Update;
+            var reviewerPublisherSetter = update.Push("Reviewers.$.Publishers", value);
+            var result = await UnitOfWork.BooksRepository.FindOneAndUpdateAsync(bookReviewerFilter, reviewerPublisherSetter);
+            return Ok(result);
+        }
+
+        // PUT: api/Book/AddReviewerPublisher/5e94940cf9ccc34df04c9e74/Aho Ulm
+        [HttpPut("AddReviewerPublishers/{id}/{reviewerName}")]
+        public async Task<ActionResult<Book>> AddReviewerPublishers(string id, string reviewerName, [FromBody] List<Publisher> values)
+        {
+            var filter = Builders<Book>.Filter;
+            var bookReviewerFilter = filter.And(
+              filter.Eq(x => x.Id, id),
+              filter.ElemMatch(x => x.Reviewers, c => c.Name == reviewerName));
+
+            // update with positional operator
+            var update = Builders<Book>.Update;
+            var reviewerPublisherSetter = update.PushEach("Reviewers.$.Publishers", values);
+            var result = await UnitOfWork.BooksRepository.FindOneAndUpdateAsync(bookReviewerFilter, reviewerPublisherSetter);
+            return Ok(result);
+        }
+
+        // POST: api/Book/AddReviewerPublisher/5e94940cf9ccc34df04c9e74/Aho Ulm
+        [HttpPost("UpdateReviewerPublisher/{id}/{reviewerName}")]
+        public async Task<ActionResult<Book>> UpdateReviewerPublisher(string id, string reviewerName, [FromBody] Publisher value)
+        {
+            var update = Builders<Book>.Update.Set("Reviewers.$[r].Publishers.$[p]", value);
+            var updateOptions =  new UpdateOptions
+            {
+                ArrayFilters = new List<ArrayFilterDefinition>
+                {
+                    new BsonDocumentArrayFilterDefinition<BsonDocument>(new BsonDocument("r.Name", reviewerName)),
+                    new BsonDocumentArrayFilterDefinition<BsonDocument>(new BsonDocument("p.Name", value.Name))
+                }
+            };
+            var result = await UnitOfWork.BooksRepository.UpdateOneAsync(x => x.Id == id,
+                update, updateOptions);
+            return Ok(result);
+        }
+
+        // DELETE: api/Book/DeleteReviewerPublisher/5e94940cf9ccc34df04c9e74/Aho Ulm/Addison Wesley
+        [HttpDelete("DeleteReviewerPublisher/{id}/{reviewerName}/{publisherName}")]
+        public async Task<ActionResult<Book>> DeleteReviewerPublisher(string id, string reviewerName, string publisherName)
+        {
+            var filter = Builders<Book>.Filter;
+            var bookReviewerFilter = filter.And(
+              filter.Eq(x => x.Id, id),
+              filter.ElemMatch(x => x.Reviewers, c => c.Name == reviewerName));
+
+            //var filter = new BsonDocument("_id", ObjectId.Parse(id));
+
+            var updateValues = Builders<Book>.Update.PullFilter("Reviewers.0.Publishers",
+                Builders<Publisher>.Filter.Eq("Name", publisherName));
+            var result = await UnitOfWork.BooksRepository.FindOneAndUpdateAsync(bookReviewerFilter, updateValues);
+
+            //var update = Builders<Book>.Update.Pull("Reviewers.$[r].Publishers.$[p].Name", publisherName);
+            //var updateOptions = new UpdateOptions
+            //{
+            //    ArrayFilters = new List<ArrayFilterDefinition>
+            //    {
+            //        new BsonDocumentArrayFilterDefinition<BsonDocument>(new BsonDocument("r.Name", reviewerName)),
+            //        //new BsonDocumentArrayFilterDefinition<BsonDocument>(new BsonDocument("p.Name", publisherName))
+            //    }
+            //};
+
+            //var result = await UnitOfWork.BooksRepository.UpdateOneAsync(x => x.Id == id,
+            //     update, updateOptions);
+            return Ok(result);
+        }
+
+            // PUT: api/Book/UpdateReviewer/5
         [HttpPut("UpdateReviewer/{id}")]
         public async Task<ActionResult<Book>> UpdateReviewer(string id, [FromBody] Reviewer value)
         {

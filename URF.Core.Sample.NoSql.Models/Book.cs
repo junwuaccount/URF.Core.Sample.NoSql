@@ -22,11 +22,19 @@ namespace URF.Core.Sample.NoSql.Models
         public List<Reviewer> Reviewers { get; set; }
     }
 
+    public class Publisher
+    {
+        public string Name { get; set; }
+        public string Address { get; set; }
+    }
+
     public class Reviewer
     {
         public string Name { get; set; }
 
         public string Institute { get; set; }
+
+        public List<Publisher> Publishers { get; set; }
     }
 
 }
