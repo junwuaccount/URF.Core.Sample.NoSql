@@ -147,9 +147,25 @@ namespace URF.Core.Sample.NoSql.Api.Controllers
             return Ok(result);
         }
 
-            // PUT: api/Book/UpdateReviewer/5
+        // PUT: api/Book/UpdateReviewer/5
         [HttpPut("UpdateReviewer/{id}")]
         public async Task<ActionResult<Book>> UpdateReviewer(string id, [FromBody] Reviewer value)
+        {
+            var filter = Builders<Book>.Filter;
+            var bookReviewerFilter = filter.And(
+              filter.Eq(x => x.Id, id),
+              filter.ElemMatch(x => x.Reviewers, c => c.Name == value.Name));
+
+            // update with positional operator
+            var update = Builders<Book>.Update;
+            var reviewerSetter = update.Set("Reviewers.$", value);
+            var result = await UnitOfWork.BooksRepository.FindOneAndUpdateAsync(bookReviewerFilter, reviewerSetter);
+            return Ok(result);
+        }
+
+        // PUT: api/Book/UpdateReviewer/5
+        [HttpPut("UpdateReviewerInstitute/{id}")]
+        public async Task<ActionResult<Book>> UpdateReviewerInstitute(string id, [FromBody] Reviewer value)
         {
             var filter = Builders<Book>.Filter;
             var bookReviewerFilter = filter.And(

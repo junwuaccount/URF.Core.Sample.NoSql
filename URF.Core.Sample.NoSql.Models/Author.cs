@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace URF.Core.Sample.NoSql.Models
@@ -12,5 +13,7 @@ namespace URF.Core.Sample.NoSql.Models
         public string Name { get; set; }
 
         public string Country { get; set; }
+        public DateTime Inserted { get; set; }
+        public DateTime Updated { get; set; }
     }
 }

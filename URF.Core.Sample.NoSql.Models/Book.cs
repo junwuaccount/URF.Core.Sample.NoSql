@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 
 namespace URF.Core.Sample.NoSql.Models
@@ -20,12 +21,16 @@ namespace URF.Core.Sample.NoSql.Models
         public string Author { get; set; }
 
         public List<Reviewer> Reviewers { get; set; }
+        public DateTime Inserted { get; set; }
+        public DateTime? Updated { get; set; }
     }
 
     public class Publisher
     {
         public string Name { get; set; }
         public string Address { get; set; }
+        public DateTime Inserted { get; set; }
+        public DateTime? Updated { get; set; }
     }
 
     public class Reviewer
@@ -35,6 +40,8 @@ namespace URF.Core.Sample.NoSql.Models
         public string Institute { get; set; }
 
         public List<Publisher> Publishers { get; set; }
+        public DateTime Inserted { get; set; }
+        public DateTime? Updated { get; set; }
     }
 
 }

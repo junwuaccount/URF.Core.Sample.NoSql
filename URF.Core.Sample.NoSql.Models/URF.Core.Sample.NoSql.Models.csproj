@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Mongo.Migration" Version="3.0.123" />
     <PackageReference Include="MongoDB.Bson" Version="2.10.2" />
   </ItemGroup>
 
