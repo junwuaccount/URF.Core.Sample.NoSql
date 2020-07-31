@@ -13,14 +13,14 @@ namespace URF.Core.Sample.NoSql.Migration
     {
         static void Main(string[] args)
         {
-            var client = new MongoClient("mongodb+srv://junwuaccount:pa$$w0rd@hiltitest-tcj8a.mongodb.net/test?retryWrites=true&w=majority");
+            var client = new MongoClient("mongodb+srv://junwuaccount:pa$$w0rd@hiltitest-xxxxx.mongodb.net/test?retryWrites=true&w=majority");
 
             // Init MongoMigration
             MongoMigrationClient.Initialize(
                 client,
                 new MongoMigrationSettings()
                 {
-                    ConnectionString = "mongodb+srv://junwuaccount:pa$$w0rd@hiltitest-tcj8a.mongodb.net/test?retryWrites=true&w=majority",
+                    ConnectionString = "mongodb+srv://junwuaccount:pa$$w0rd@hiltitest-xxxx.mongodb.net/test?retryWrites=true&w=majority",
                     Database = "BookstoreDb",
                     DatabaseMigrationVersion = new DocumentVersion(0, 0, 0) //set to old version to roll back to by apply appled migration reversely
                 },
