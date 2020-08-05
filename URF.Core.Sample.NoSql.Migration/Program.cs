@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 using Mongo.Migration.Documents;
 using Mongo.Migration.Migrations.Adapters;
 using Mongo.Migration.Startup;
@@ -11,19 +13,53 @@ namespace URF.Core.Sample.NoSql.Migration
 {
     class Program
     {
+        private static IConfiguration _appConfig;
+
+        private static IConfiguration LoadConfiguration()
+        {
+            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
+                .AddEnvironmentVariables();
+            var appConfig = builder.Build();
+
+            return appConfig;
+        }
+
         static void Main(string[] args)
         {
-            var client = new MongoClient("mongodb+srv://junwuaccount:pa$$w0rd@hiltitest-xxxxx.mongodb.net/test?retryWrites=true&w=majority");
+            string migrateToVersion = null;
+
+            if (args.Length > 0)
+                migrateToVersion = args[0];
+
+            _appConfig = LoadConfiguration();
+
+            var dbConnStr = _appConfig["DBConnectionString"];
+            var client = new MongoClient(dbConnStr);
 
             // Init MongoMigration
+            MongoMigrationSettings migrationSettings = null;
+
+            if (!string.IsNullOrEmpty(migrateToVersion))
+                migrationSettings = new MongoMigrationSettings()
+                {
+                    ConnectionString = dbConnStr,
+                    Database = "BookstoreDb",
+                    DatabaseMigrationVersion = new DocumentVersion(migrateToVersion) //set to old version to roll back to by apply appled migration reversely
+                };
+            else
+                migrationSettings = new MongoMigrationSettings()
+                {
+                    ConnectionString = dbConnStr,
+                    Database = "BookstoreDb",
+                };
+
             MongoMigrationClient.Initialize(
                 client,
-                new MongoMigrationSettings()
-                {
-                    ConnectionString = "mongodb+srv://junwuaccount:pa$$w0rd@hiltitest-xxxx.mongodb.net/test?retryWrites=true&w=majority",
-                    Database = "BookstoreDb",
-                    DatabaseMigrationVersion = new DocumentVersion(0, 0, 0) //set to old version to roll back to by apply appled migration reversely
-                },
+                migrationSettings,
                 new LightInjectAdapter(new LightInject.ServiceContainer()));
 
             Console.WriteLine("Apply database migrations: ");

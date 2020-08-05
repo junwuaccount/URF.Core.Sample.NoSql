@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "URF.Core.Sample.NoSql.Migration": {
+      "commandName": "Project",
+      "commandLineArgs": "0.0.0",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
